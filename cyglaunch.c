@@ -32,19 +32,19 @@ void OnCygwinConnection(char *CygwinDirectory, char *cmdline)
 	PROCESS_INFORMATION pi;
 
 	if (strlen(CygwinDirectory) > 0) {
-		if (SearchPath(CygwinDirectory, "bin\\cygwin1", ".dll", sizeof(file), file, &filename) > 0) {
+		if (SearchPath(CygwinDirectory, "bin\\msys-2.0", ".dll", sizeof(file), file, &filename) > 0) {
 			goto found_dll;
 		}
 	}
 
-	if (SearchPath(NULL, "cygwin1", ".dll", sizeof(file), file, &filename) > 0) {
+	if (SearchPath(NULL, "msys-2.0", ".dll", sizeof(file), file, &filename) > 0) {
 		goto found_path;
 	}
 
 	for (c = 'C' ; c <= 'Z' ; c++) {
 		char tmp[MAX_PATH];
-		sprintf(tmp, "%c:\\cygwin\\bin;%c:\\cygwin64\\bin", c, c);
-		if (SearchPath(tmp, "cygwin1", ".dll", sizeof(file), file, &filename) > 0) {
+		sprintf(tmp, "%c:\\msys\\bin;%c:\\msys64\\bin", c, c);
+		if (SearchPath(tmp, "msys-2.0", ".dll", sizeof(file), file, &filename) > 0) {
 			goto found_dll;
 		}
 	}
@@ -54,23 +54,23 @@ void OnCygwinConnection(char *CygwinDirectory, char *cmdline)
 
 found_dll:;
 	envptr = getenv("PATH");
-	file[strlen(file)-12] = '\0'; // delete "\\cygwin1.dll"
+	file[strlen(file)-13] = '\0'; // delete "\\msys-2.0.dll"
 	if (envptr != NULL) {
 		envbufflen = strlen(file) + strlen(envptr) + 7; // "PATH="(5) + ";"(1) + NUL(1)
 		if ((envbuff=malloc(envbufflen)) == NULL) {
 			MessageBox(NULL, "Can't allocate memory.", "ERROR", MB_OK | MB_ICONWARNING);
 			return;
 		}
-		_snprintf(envbuff, envbufflen, "PATH=%s;%s", file, envptr);
+		snprintf(envbuff, envbufflen, "PATH=%s;%s", file, envptr);
 	} else {
 		envbufflen = strlen(file) + strlen(envptr) + 6; // "PATH="(5) + NUL(1)
 		if ((envbuff=malloc(envbufflen)) == NULL) {
 			MessageBox(NULL, "Can't allocate memory.", "ERROR", MB_OK | MB_ICONWARNING);
 			return;
 		}
-		_snprintf(envbuff, envbufflen, "PATH=%s", file);
+		snprintf(envbuff, envbufflen, "PATH=%s", file);
 	}
-	_putenv(envbuff);
+	putenv(envbuff);
 	if (envbuff) {
 		free(envbuff);
 		envbuff = NULL;
@@ -107,15 +107,15 @@ int main(int argc, char** argv)
 	if (GetModuleFileName(NULL, Temp, sizeof(Temp)) > 0 &&
 	   (bs = strrchr(Temp, '\\')) != NULL) {
 		*bs = 0;
-		_chdir(Temp);
-		_snprintf(bs, sizeof(Temp) + Temp - bs, "\\%s", FName);
+		chdir(Temp);
+		snprintf(bs, sizeof(Temp) + Temp - bs, "\\%s", FName);
 	}
 	else {
-		_snprintf(Temp, sizeof(Temp), ".\\", FName);
+		snprintf(Temp, sizeof(Temp), ".\\", FName);
 	}
 
 	// Cygwin install path
- 	GetPrivateProfileString(Section, "CygwinDirectory", "c:\\cygwin",
+ 	GetPrivateProfileString(Section, "CygwinDirectory", "c:\\msys",
 			  CygwinDir, sizeof(CygwinDir), Temp);
 
 	//printf("%s %d\n", CygwinDir, GetLastError());

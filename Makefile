@@ -42,13 +42,13 @@ $(LAUNCH) : $(LAUNCH_SRC) $(ICO) $(RC)
 	windres -O coff -o $(RES) $(RC)
 	( i686-pc-mingw32-gcc $(CFLAGS) $(LDFLAGS) -o $(LAUNCH) $(LAUNCH_SRC) $(RES) ) || \
 	( i686-w64-mingw32-gcc $(CFLAGS) $(LDFLAGS) -o $(LAUNCH) $(LAUNCH_SRC) $(RES) ) || \
-	( $(CC) $(CFLAGS) $(LDFLAGS) -mno-cygwin -o $(LAUNCH) $(LAUNCH_SRC) $(RES) ) || \
-	( gcc-3 $(CFLAGS) $(LDFLAGS) -mno-cygwin -o $(LAUNCH) $(LAUNCH_SRC) $(RES) )
+	( $(CC) $(CFLAGS) $(LDFLAGS) -o $(LAUNCH) $(LAUNCH_SRC) $(RES) ) || \
+	( gcc-3 $(CFLAGS) $(LDFLAGS) -o $(LAUNCH) $(LAUNCH_SRC) $(RES) )
 	strip $(LAUNCH)
   else
-	x86_64-w64-mingw32-windres -O coff -o $(RES) $(RC)
-	x86_64-w64-mingw32-gcc $(CFLAGS) $(LDFLAGS) -o $(LAUNCH) $(LAUNCH_SRC) $(RES)
-	x86_64-w64-mingw32-strip $(LAUNCH)
+	windres -O coff -o $(RES) $(RC)
+	gcc $(CFLAGS) $(LDFLAGS) -o $(LAUNCH) $(LAUNCH_SRC) $(RES)
+	strip $(LAUNCH)
   endif
 
 $(RC):
